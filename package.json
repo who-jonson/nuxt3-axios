@@ -50,10 +50,6 @@
     "vue": "^3.2.37",
     "webpack": "^5.73.0"
   },
-  "author": {
-    "name": "Jonson B.",
-    "email": "www.jbc.bd@gmail.com"
-  },
   "sideEffects": false,
   "bugs": {
     "url": "https://github.com/who-jonson/nuxt3-axios/issues"
