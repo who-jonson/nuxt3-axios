@@ -1,6 +1,8 @@
-import { addPluginTemplate, createResolver, defineNuxtModule } from '@nuxt/kit';
+import { addPluginTemplate, createResolver, defineNuxtModule, addAutoImport, resolveModule } from '@nuxt/kit';
 import { name, version } from '../package.json';
 import type { ModuleOptions, NuxtAxiosInstance } from './options';
+
+export { ModuleOptions, NuxtAxiosInstance };
 
 const CONFIG_KEY = 'axios';
 
@@ -28,7 +30,6 @@ export default defineNuxtModule({
   } as ModuleOptions,
   setup(_moduleOptions, nuxt) {
     // Combine options
-
     const moduleOptions: ModuleOptions = {
       ..._moduleOptions,
       ...(nuxt.options.runtimeConfig.public && nuxt.options.runtimeConfig.public[CONFIG_KEY])
@@ -136,28 +137,26 @@ export default defineNuxtModule({
     options.globalName = nuxt.options.globalName || 'nuxt';
 
     // resolver
-    const resolver = createResolver(import.meta.url);
+    const { resolve } = createResolver(import.meta.url);
+    const resolveComposable = (path: string) => resolveModule(path, { paths: resolve('./runtime/composables/') });
 
     // Register plugin
     addPluginTemplate({
-      src: resolver.resolve('./runtime/plugin.template.mjs'),
+      src: resolve('./runtime/plugin.template.mjs'),
       filename: 'axios.plugin.mjs',
       options
     });
+
+    addAutoImport([
+      { name: 'useAxios', as: 'useAxios', from: resolveComposable('./axios') },
+      { name: 'useAxiosGet', as: 'useAxiosGet', from: resolveComposable('./axios') },
+      { name: 'useAxiosPut', as: 'useAxiosPut', from: resolveComposable('./axios') },
+      { name: 'useAxiosPost', as: 'useAxiosPost', from: resolveComposable('./axios') },
+      { name: 'useAxiosPatch', as: 'useAxiosPatch', from: resolveComposable('./axios') },
+      { name: 'useAxiosDelete', as: 'useAxiosDelete', from: resolveComposable('./axios') }
+    ]);
 
     // Set _AXIOS_BASE_URL_ for dynamic SSR baseURL
     process.env._AXIOS_BASE_URL_ = options.baseURL;
   }
 });
-
-declare module '#app' {
-  interface NuxtApp {
-    $axios: NuxtAxiosInstance
-  }
-}
-
-declare module '@vue/runtime-core' {
-  interface ComponentCustomProperties {
-    $axios: NuxtAxiosInstance
-  }
-}

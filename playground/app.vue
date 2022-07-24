@@ -5,7 +5,14 @@
 </template>
 
 <script lang="ts" setup>
-const { $axios } = useNuxtApp();
-const { data } = await useAsyncData('user', () => $axios.$get('https://jsonplaceholder.typicode.com/todos/1'));
-console.log(data.value);
+import { useAxiosGet } from '#imports';
+
+interface UserData {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+const { data } = await useAxiosGet<UserData>('https://jsonplaceholder.typicode.com/todos/1');
 </script>

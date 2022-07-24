@@ -1,5 +1,5 @@
 import { defineNuxtConfig } from 'nuxt';
-import Nuxt3Axios from '..';
+import Nuxt3Axios from '../src/module';
 
 export default defineNuxtConfig({
   modules: [

@@ -79,9 +79,3 @@ export interface ModuleOptions {
     patch?: Record<string, string>
   }
 }
-
-declare module 'axios' {
-  interface AxiosRequestConfig {
-    progress?: boolean
-  }
-}
