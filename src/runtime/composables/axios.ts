@@ -46,10 +46,27 @@ interface UseAxiosParamsWithData<T, D> extends UseAxiosParams<T> {
   config?: AxiosRequestConfig<D>;
 }
 
+/**
+ * It takes a value and a callback, and returns the result of the callback.
+ * @param value - T - The value to pass to the callback.
+ * @param callback - (value: T) => D
+ * @returns The callback function is being returned.
+ */
 function tapUse<T, D = any>(value: T, callback: (value: T) => D): D {
   return callback(value);
 }
 
+/**
+ * If there's one argument, it's the url. If there's two arguments, the first is the url and the second is the config. If
+ * there's three arguments, the first is the url, the second is the config, and the third is the options
+ * @param {any[]} args - any[] - This is the arguments that are passed to the useAxios hook.
+ * @returns function getParams<T>(...args: any[]): UseAxiosParams<T> {
+ *   if (args.length === 1) {
+ *     return { url: args[0] };
+ *   }
+ *   if (args.length === 2) {
+ *     return { url: args[0], config: args[1].config || {},
+ */
 function getParams<T>(...args: any[]): UseAxiosParams<T> {
   if (args.length === 1) {
     return { url: args[0] };
@@ -61,6 +78,16 @@ function getParams<T>(...args: any[]): UseAxiosParams<T> {
   }
 }
 
+/**
+ * If there are 1, 2, 3, or 4 arguments, return an object with the url, reqData, config, and options properties
+ * @param {any[]} args - The arguments passed to the useAxios hook.
+ * @returns function getParamsWithData<T, D>(...args: any[]): UseAxiosParamsWithData<T, D> {
+ *   if (args.length === 1) {
+ *     return { url: args[0] };
+ *   }
+ *   if (args.length === 2) {
+ *     return { url: args[0], reqData
+ */
 function getParamsWithData<T, D>(...args: any[]): UseAxiosParamsWithData<T, D> {
   if (args.length === 1) {
     return { url: args[0] };
@@ -75,6 +102,20 @@ function getParamsWithData<T, D>(...args: any[]): UseAxiosParamsWithData<T, D> {
   }
 }
 
+/**
+ * It takes in a URL and an optional config object, and returns an object with the same properties as the `useAsyncData`
+ * function
+ * @param url - The arguments passed to the useAxios function.
+ * @param config - The arguments passed to the useAxios function.
+ * @param options - The arguments passed to the useAxios function.
+ * @returns A function that returns an object with the following properties:
+ * - data: The data returned from the request
+ * - error: The error returned from the request
+ * - loading: A boolean indicating if the request is pending
+ * - aborted: A boolean indicating if the request was aborted
+ * - cancel: A function that aborts the request
+ * - cancelToken: A CancelToken that can be used to abort
+ */
 export function useAxios<T, E = Error>(url: string, config?: AxiosRequestConfig, options?: Omit<UseAxiosOptions<T>, 'config'>): UseAxiosResponse<T, E>;
 export function useAxios<T, E = Error>(url: string, options?: UseAxiosOptions<T>): UseAxiosResponse<T, E>;
 export function useAxios<T, E = Error>(...args: any[]): UseAxiosResponse<T, E> {
