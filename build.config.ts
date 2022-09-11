@@ -8,9 +8,6 @@ const rootDir = fileURLToPath(new URL('./', import.meta.url));
 export default defineBuildConfig({
   clean: true,
   declaration: true,
-  // entries: [
-  //   'src/types'
-  // ],
   outDir: 'dist',
   rollup: {
     esbuild: {

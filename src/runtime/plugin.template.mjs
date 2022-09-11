@@ -1,4 +1,4 @@
-import { defineNuxtPlugin } from '#app';
+import { createError, defineNuxtPlugin } from '#app';
 import Axios from 'axios';
 '<% if (options.retry) { %>'
 import axiosRetry from 'axios-retry';
@@ -45,7 +45,9 @@ const axiosExtra = {
 
 // Request helpers ($get, $post, ...)
 for (const method of ['request', 'delete', 'get', 'head', 'options', 'post', 'put', 'patch']) {
-  axiosExtra['$' + method] = function () { return this[method].apply(this, arguments).then(res => res && res.data) }
+  axiosExtra['$' + method] = function () {
+    return this[method].apply(this, arguments).then(res => res && res.data).catch(err => createError(err.response || err))
+  }
 }
 
 const extendAxiosInstance = axios => {

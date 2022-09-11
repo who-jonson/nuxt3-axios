@@ -1,49 +1,56 @@
-import { ref } from 'vue';
-import { useAsyncData } from '#app';
-import type { AsyncDataOptions, AsyncData, NuxtApp } from '#app';
+import { ref, type Ref } from 'vue';
+import { useAsyncData, type NuxtApp } from 'nuxt/app';
+import type { _AsyncData, _Transform, AsyncDataOptions, KeyOfRes, PickFrom } from 'nuxt/dist/app/composables/asyncData';
 import type { AxiosRequestConfig } from 'axios';
-import type { Ref } from 'vue';
+import type { NuxtAxiosInstance } from '../../options';
 
-type HandlerFn<T> = (app?: NuxtApp) => Promise<T>;
+interface _NuxtApp extends NuxtApp {
+  $axios: NuxtAxiosInstance
+}
+
+type HandlerFn<T> = (ctx?: _NuxtApp) => Promise<T>;
+
 type RequestData = FormData | Record<string, any> | {[p: string]: any} | null | undefined;
 
-export interface UseAxiosOptions<T, D = RequestData> extends AsyncDataOptions<T> {
+export interface _AxiosAsyncData<DataT, ErrorT> extends _AsyncData<DataT, ErrorT>{
+    /**
+     * Indicates if the request was canceled
+     */
+    aborted: Ref<boolean>
+
+    /**
+     * Aborts the current request
+     */
+    abort: () => void
+
+    /**
+     * abort alias
+     */
+    cancel: () => void
+
+    /**
+     * isAborted alias
+     */
+    canceled: Ref<boolean>
+  }
+
+export declare type AxiosAsyncData<Data, Error> = _AxiosAsyncData<Data, Error> & Promise<_AxiosAsyncData<Data, Error>>;
+
+export interface UseAxiosOptions<DataT, D = RequestData, Transform extends _Transform<DataT> = _Transform<DataT, DataT>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>> extends AsyncDataOptions<DataT, Transform, PickKeys> {
   key?: string,
   config?: AxiosRequestConfig<D>
 }
 
-export interface UseAxiosResponse<T, E = Error> extends AsyncData<T, E>{
+export type AsyncDataResponse<DataT, DataE = Error, Transform extends _Transform<DataT> = _Transform<DataT, DataT>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>> = AxiosAsyncData<PickFrom<ReturnType<Transform>, PickKeys>, DataE | null | true>;
 
-  /**
-   * Indicates if the request was canceled
-   */
-  aborted: Ref<boolean>
-
-  /**
-   * Aborts the current request
-   */
-  abort: () => void
-
-  /**
-   * abort alias
-   */
-  cancel: () => void
-
-  /**
-   * isAborted alias
-   */
-  canceled: Ref<boolean>
-}
-
-interface UseAxiosParams<T> {
+export interface UseAxiosParams<T, D = RequestData, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>> {
   url: string;
-  config?: AxiosRequestConfig;
-  options?: UseAxiosOptions<T>
+  config?: AxiosRequestConfig<D>;
+  options?: UseAxiosOptions<T, D, Transform, PickKeys>
 }
 
-interface UseAxiosParamsWithData<T, D> extends UseAxiosParams<T> {
+export interface UseAxiosParamsWithData<T, D = RequestData, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>> extends UseAxiosParams<T, D, Transform, PickKeys> {
   reqData?: D;
-  config?: AxiosRequestConfig<D>;
 }
 
 /**
@@ -67,7 +74,7 @@ function tapUse<T, D = any>(value: T, callback: (value: T) => D): D {
  *   if (args.length === 2) {
  *     return { url: args[0], config: args[1].config || {},
  */
-function getParams<T>(...args: any[]): UseAxiosParams<T> {
+function getParams<T, D = RequestData, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(...args: any[]): UseAxiosParams<T, D, Transform, PickKeys> {
   if (args.length === 1) {
     return { url: args[0] };
   }
@@ -88,7 +95,7 @@ function getParams<T>(...args: any[]): UseAxiosParams<T> {
  *   if (args.length === 2) {
  *     return { url: args[0], reqData
  */
-function getParamsWithData<T, D>(...args: any[]): UseAxiosParamsWithData<T, D> {
+function getParamsWithData<T, D = RequestData, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(...args: any[]): UseAxiosParamsWithData<T, D, Transform, PickKeys> {
   if (args.length === 1) {
     return { url: args[0] };
   }
@@ -116,11 +123,11 @@ function getParamsWithData<T, D>(...args: any[]): UseAxiosParamsWithData<T, D> {
  * - cancel: A function that aborts the request
  * - cancelToken: A CancelToken that can be used to abort
  */
-export function useAxios<T, E = Error>(url: string, config?: AxiosRequestConfig, options?: Omit<UseAxiosOptions<T>, 'config'>): UseAxiosResponse<T, E>;
-export function useAxios<T, E = Error>(url: string, options?: UseAxiosOptions<T>): UseAxiosResponse<T, E>;
-export function useAxios<T, E = Error>(...args: any[]): UseAxiosResponse<T, E> {
+export function useAxios<T, E = Error, D = RequestData, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, config?: AxiosRequestConfig<D>, options?: Omit<UseAxiosOptions<T, D, Transform, PickKeys>, 'config'>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxios<T, E = Error, D = RequestData, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, options?: UseAxiosOptions<T, D, Transform, PickKeys>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxios<T, E = Error, D = RequestData, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(...args: any[]): AsyncDataResponse<T, E, Transform, PickKeys> {
   // eslint-disable-next-line prefer-const
-  let { url, config, options } = getParams<T>(...args);
+  let { url, config, options } = getParams<T, D, Transform, PickKeys>(...args);
   const controller = new AbortController();
   config = {
     ...(config || {}),
@@ -138,15 +145,15 @@ export function useAxios<T, E = Error>(...args: any[]): UseAxiosResponse<T, E> {
     controller.abort();
   };
 
-  const handler: HandlerFn<T> = ({ $axios }) => $axios.$request(config);
+  const handler: HandlerFn<T> = ({ $axios }) => $axios.$request<T, D>(config);
 
   if (options?.key) {
     const key = options.key;
     delete options.key;
 
-    result = useAsyncData<T, E>(key, handler, options);
+    result = useAsyncData<T, E, Transform, PickKeys>(key, handler, options);
   } else {
-    result = useAsyncData<T, E>(handler, options);
+    result = useAsyncData<T, E, Transform, PickKeys>(handler, options);
   }
 
   result.aborted = result.canceled = aborted;
@@ -155,22 +162,22 @@ export function useAxios<T, E = Error>(...args: any[]): UseAxiosResponse<T, E> {
   return result;
 }
 
-export function useAxiosGet<T, E = Error>(url: string, config?: AxiosRequestConfig, options?: Omit<UseAxiosOptions<T>, 'config'>): UseAxiosResponse<T, E>;
-export function useAxiosGet<T, E = Error>(url: string, options?: UseAxiosOptions<T>): UseAxiosResponse<T, E>;
-export function useAxiosGet<T, E = Error>(...args: any[]): UseAxiosResponse<T, E> {
-  return tapUse<UseAxiosParams<T>, UseAxiosResponse<T, E>>(getParams<T>(...args), ({ url, config, options }) => {
-    return useAxios<T, E>(url, {
+export function useAxiosGet<T, E = Error, D = RequestData, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, config?: AxiosRequestConfig<D>, options?: Omit<UseAxiosOptions<T, D, Transform, PickKeys>, 'config'>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxiosGet<T, E = Error, D = RequestData, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, options?: UseAxiosOptions<T, D, Transform, PickKeys>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxiosGet<T, E = Error, D = RequestData, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(...args: any[]): AsyncDataResponse<T, E, Transform, PickKeys> {
+  return tapUse<UseAxiosParams<T, D, Transform, PickKeys>, AsyncDataResponse<T, E, Transform, PickKeys>>(getParams<T, D, Transform, PickKeys>(...args), ({ url, config, options }) => {
+    return useAxios<T, E, D, Transform, PickKeys>(url, {
       ...(config || {}),
       method: 'GET'
     }, options);
   });
 }
 
-export function useAxiosPost<T, D = RequestData, E = Error>(url: string, data?: D, config?: AxiosRequestConfig<D>, options?: Omit<UseAxiosOptions<T, D>, 'config'>): UseAxiosResponse<T, E>;
-export function useAxiosPost<T, D = RequestData, E = Error>(url: string, data?: D, options?: UseAxiosOptions<T, D>): UseAxiosResponse<T, E>;
-export function useAxiosPost<T, D = RequestData, E = Error>(...args: any[]): UseAxiosResponse<T, E> {
-  return tapUse<UseAxiosParamsWithData<T, D>, UseAxiosResponse<T, E>>(getParamsWithData<T, D>(...args), ({ url, reqData, config, options }) => {
-    return useAxios<T, E>(url, {
+export function useAxiosPost<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, data?: D, config?: AxiosRequestConfig<D>, options?: Omit<UseAxiosOptions<T, D, Transform, PickKeys>, 'config'>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxiosPost<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, data?: D, options?: UseAxiosOptions<T, D, Transform, PickKeys>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxiosPost<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(...args: any[]): AsyncDataResponse<T, E, Transform, PickKeys> {
+  return tapUse<UseAxiosParamsWithData<T, D, Transform, PickKeys>, AsyncDataResponse<T, E, Transform, PickKeys>>(getParamsWithData<T, D, Transform, PickKeys>(...args), ({ url, reqData, config, options }) => {
+    return useAxios<T, E, D, Transform, PickKeys>(url, {
       ...(config || {}),
       method: 'POST',
       data: reqData
@@ -178,11 +185,11 @@ export function useAxiosPost<T, D = RequestData, E = Error>(...args: any[]): Use
   });
 }
 
-export function useAxiosPut<T, D = RequestData, E = Error>(url: string, data?: D, config?: AxiosRequestConfig<D>, options?: Omit<UseAxiosOptions<T, D>, 'config'>): UseAxiosResponse<T, E>;
-export function useAxiosPut<T, D = RequestData, E = Error>(url: string, data?: D, options?: UseAxiosOptions<T, D>): UseAxiosResponse<T, E>;
-export function useAxiosPut<T, D = RequestData, E = Error>(...args: any[]): UseAxiosResponse<T, E> {
-  return tapUse<UseAxiosParamsWithData<T, D>, UseAxiosResponse<T, E>>(getParamsWithData<T, D>(...args), ({ url, reqData, config, options }) => {
-    return useAxios<T, E>(url, {
+export function useAxiosPut<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, data?: D, config?: AxiosRequestConfig<D>, options?: Omit<UseAxiosOptions<T, D, Transform, PickKeys>, 'config'>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxiosPut<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, data?: D, options?: UseAxiosOptions<T, D, Transform, PickKeys>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxiosPut<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(...args: any[]): AsyncDataResponse<T, E, Transform, PickKeys> {
+  return tapUse<UseAxiosParamsWithData<T, D, Transform, PickKeys>, AsyncDataResponse<T, E, Transform, PickKeys>>(getParamsWithData<T, D, Transform, PickKeys>(...args), ({ url, reqData, config, options }) => {
+    return useAxios<T, E, D, Transform, PickKeys>(url, {
       ...(config || {}),
       method: 'PUT',
       data: reqData
@@ -190,11 +197,11 @@ export function useAxiosPut<T, D = RequestData, E = Error>(...args: any[]): UseA
   });
 }
 
-export function useAxiosPatch<T, D = RequestData, E = Error>(url: string, data?: D, config?: AxiosRequestConfig<D>, options?: Omit<UseAxiosOptions<T, D>, 'config'>): UseAxiosResponse<T, E>;
-export function useAxiosPatch<T, D = RequestData, E = Error>(url: string, data?: D, options?: UseAxiosOptions<T, D>): UseAxiosResponse<T, E>;
-export function useAxiosPatch<T, D = RequestData, E = Error>(...args: any[]): UseAxiosResponse<T, E> {
-  return tapUse<UseAxiosParamsWithData<T, D>, UseAxiosResponse<T, E>>(getParamsWithData<T, D>(...args), ({ url, reqData, config, options }) => {
-    return useAxios<T, E>(url, {
+export function useAxiosPatch<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, data?: D, config?: AxiosRequestConfig<D>, options?: Omit<UseAxiosOptions<T, D, Transform, PickKeys>, 'config'>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxiosPatch<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, data?: D, options?: UseAxiosOptions<T, D, Transform, PickKeys>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxiosPatch<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(...args: any[]): AsyncDataResponse<T, E, Transform, PickKeys> {
+  return tapUse<UseAxiosParamsWithData<T, D, Transform, PickKeys>, AsyncDataResponse<T, E, Transform, PickKeys>>(getParamsWithData<T, D, Transform, PickKeys>(...args), ({ url, reqData, config, options }) => {
+    return useAxios<T, E, D, Transform, PickKeys>(url, {
       ...(config || {}),
       method: 'PATCH',
       data: reqData
@@ -202,11 +209,11 @@ export function useAxiosPatch<T, D = RequestData, E = Error>(...args: any[]): Us
   });
 }
 
-export function useAxiosDelete<T, D = RequestData, E = Error>(url: string, data?: D, config?: AxiosRequestConfig<D>, options?: Omit<UseAxiosOptions<T, D>, 'config'>): UseAxiosResponse<T, E>;
-export function useAxiosDelete<T, D = RequestData, E = Error>(url: string, data?: D, options?: UseAxiosOptions<T, D>): UseAxiosResponse<T, E>;
-export function useAxiosDelete<T, D = RequestData, E = Error>(...args: any[]): UseAxiosResponse<T, E> {
-  return tapUse<UseAxiosParamsWithData<T, D>, UseAxiosResponse<T, E>>(getParamsWithData<T, D>(...args), ({ url, reqData, config, options }) => {
-    return useAxios<T, E>(url, {
+export function useAxiosDelete<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, data?: D, config?: AxiosRequestConfig<D>, options?: Omit<UseAxiosOptions<T, D, Transform, PickKeys>, 'config'>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxiosDelete<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(url: string, data?: D, options?: UseAxiosOptions<T, D, Transform, PickKeys>): AsyncDataResponse<T, E, Transform, PickKeys>;
+export function useAxiosDelete<T, D = RequestData, E = Error, Transform extends _Transform<T> = _Transform<T, T>, PickKeys extends KeyOfRes<Transform> = KeyOfRes<Transform>>(...args: any[]): AsyncDataResponse<T, E, Transform, PickKeys> {
+  return tapUse<UseAxiosParamsWithData<T, D, Transform, PickKeys>, AsyncDataResponse<T, E, Transform, PickKeys>>(getParamsWithData<T, D, Transform, PickKeys>(...args), ({ url, reqData, config, options }) => {
+    return useAxios<T, E, D, Transform, PickKeys>(url, {
       ...(config || {}),
       method: 'DELETE',
       data: reqData

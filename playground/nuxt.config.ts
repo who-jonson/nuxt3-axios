@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     Nuxt3Axios
   ],
   axios: {
-    credentials: true
+    credentials: true,
+    debug: true
   }
 });

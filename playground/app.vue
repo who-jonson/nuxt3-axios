@@ -14,5 +14,8 @@ interface UserData {
   completed: boolean;
 }
 
-const { data } = await useAxiosGet<UserData>('https://jsonplaceholder.typicode.com/todos/1');
+const { data, error } = await useAxiosGet<UserData, Error>('/api/error', {
+  lazy: true
+});
+console.log(data, error);
 </script>

@@ -2,25 +2,25 @@ import type { AxiosError, AxiosRequestConfig, AxiosResponse, AxiosStatic } from 
 import type { IAxiosRetryConfig } from 'axios-retry';
 
 export interface NuxtAxiosInstance extends AxiosStatic {
-  $request<T = any>(config: AxiosRequestConfig): Promise<T>
-  $get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>
-  $delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>
-  $head<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>
-  $options<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>
-  $post<T = any>(
+  $request<T = any, D = any>(config: AxiosRequestConfig<D>): Promise<T>
+  $get<T = any, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<T>
+  $delete<T = any, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<T>
+  $head<T = any, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<T>
+  $options<T = any, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<T>
+  $post<T = any, D = any>(
     url: string,
-    data?: any,
-    config?: AxiosRequestConfig
+    data?: D,
+    config?: AxiosRequestConfig<D>
   ): Promise<T>
-  $put<T = any>(
+  $put<T = any, D = any>(
     url: string,
-    data?: any,
-    config?: AxiosRequestConfig
+    data?: D,
+    config?: AxiosRequestConfig<D>
   ): Promise<T>
-  $patch<T = any>(
+  $patch<T = any, D = any>(
     url: string,
-    data?: any,
-    config?: AxiosRequestConfig
+    data?: D,
+    config?: AxiosRequestConfig<D>
   ): Promise<T>
 
   setBaseURL(baseURL: string): void
@@ -35,19 +35,19 @@ export interface NuxtAxiosInstance extends AxiosStatic {
     scopes?: string | string[]
   ): void
 
-  onRequest(
+  onRequest<D = any>(
     callback: (
-      config: AxiosRequestConfig
-    ) => void | AxiosRequestConfig | Promise<AxiosRequestConfig>
+      config: AxiosRequestConfig<D>
+    ) => void | AxiosRequestConfig<D> | Promise<AxiosRequestConfig<D>>
   ): void
-  onResponse<T = any>(
+  onResponse<T = any, D = any>(
     callback: (
-      response: AxiosResponse<T>
-    ) => void | AxiosResponse<T> | Promise<AxiosResponse<T>>
+      response: AxiosResponse<T, D>
+    ) => void | AxiosResponse<T, D> | Promise<AxiosResponse<T, D>>
   ): void
-  onError(callback: (error: AxiosError) => any): void
-  onRequestError(callback: (error: AxiosError) => any): void
-  onResponseError(callback: (error: AxiosError) => any): void
+  onError<T = unknown, D = any>(callback: (error: AxiosError<T, D>) => any): void
+  onRequestError<T = unknown, D = any>(callback: (error: AxiosError<T, D>) => any): void
+  onResponseError<T = unknown, D = any>(callback: (error: AxiosError<T, D>) => any): void
 
   create(options?: AxiosRequestConfig): NuxtAxiosInstance
 }
