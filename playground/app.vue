@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useAxiosGet } from '#imports';
+import { onMounted, useAxios } from '#imports';
 
 interface UserData {
   userId: number;
@@ -14,8 +14,10 @@ interface UserData {
   completed: boolean;
 }
 
-const { data, error } = await useAxiosGet<UserData, Error>('/api/error', {
-  lazy: true
+const { execute } = useAxios<UserData>('/api/error', {}, { immediate: false });
+
+onMounted(async() => {
+  const { data, error } = await execute('/api/error');
+  console.log(data, error);
 });
-console.log(data, error);
 </script>

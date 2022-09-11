@@ -46,6 +46,7 @@ export interface NuxtAxiosInstance extends AxiosStatic {
     ) => void | AxiosResponse<T, D> | Promise<AxiosResponse<T, D>>
   ): void
   onError<T = unknown, D = any>(callback: (error: AxiosError<T, D>) => any): void
+  onAuthError<T = unknown, D = any>(callback: (error: AxiosError<T, D>) => any): void
   onRequestError<T = unknown, D = any>(callback: (error: AxiosError<T, D>) => any): void
   onResponseError<T = unknown, D = any>(callback: (error: AxiosError<T, D>) => any): void
 

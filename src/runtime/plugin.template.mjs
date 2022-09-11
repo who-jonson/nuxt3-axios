@@ -1,8 +1,8 @@
-import { createError, defineNuxtPlugin } from '#app';
 import Axios from 'axios';
-'<% if (options.retry) { %>'
+<% if (options.retry) { %>
 import axiosRetry from 'axios-retry';
-'<% } %>'
+<% } %>
+import { createError, defineNuxtPlugin } from '#app';
 
 // Axios.prototype cannot be modified
 const axiosExtra = {
@@ -38,6 +38,14 @@ const axiosExtra = {
     this.onRequestError(fn)
     this.onResponseError(fn)
   },
+  onAuthError(fn) {
+    this.onError((error) => {
+        const code = parseInt(error.response && error.response.status);
+        if (code === 401) {
+            fn(error);
+        }
+    })
+  },
   create(options) {
     return createAxiosInstance({ ...this.defaults, ...options })
   }
@@ -72,15 +80,15 @@ const createAxiosInstance = axiosOptions => {
   })
 
   // Setup interceptors
-  '<% if (options.debug) { %>'; setupDebugInterceptor(axios); '<% } %>'
-  '<% if (options.credentials) { %>'; setupCredentialsInterceptor(axios); '<% } %>'
-  '<% if (options.progress) { %>'; setupProgress(axios); '<% } %>'
-  '<% if (options.retry) { %>'; axiosRetry(axios, JSON.parse('<%= JSON.stringify(options.retry) %>')); '<% } %>'
+  <% if (options.debug) { %>setupDebugInterceptor(axios); <% } %>
+  <% if (options.credentials) { %>setupCredentialsInterceptor(axios); <% } %>
+  <% if (options.progress) { %>setupProgress(axios); <% } %>
+  <% if (options.retry) { %>axiosRetry(axios, JSON.parse('<%= JSON.stringify(options.retry) %>')); <% } %>
 
   return axios
 }
 
-'<% if (options.debug) { %>'
+<% if (options.debug) { %>
 const log = (level, ...messages) => console[level]('[Axios]', ...messages)
 
 const setupDebugInterceptor = axios => {
@@ -109,9 +117,9 @@ const setupDebugInterceptor = axios => {
     return res
   })
 }
-'<% } %>'
+<% } %>
 
-'<% if (options.credentials) { %>'
+<% if (options.credentials) { %>
 const setupCredentialsInterceptor = axios => {
   // Send credentials only to relative and API Backend requests
   axios.onRequest(config => {
@@ -122,7 +130,7 @@ const setupCredentialsInterceptor = axios => {
     }
   })
 }
-'<% } %>'
+<% } %>
 
 '<% if (options.progress) { %>'
 const setupProgress = (axios) => {

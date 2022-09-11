@@ -31,13 +31,17 @@
   },
   "dependencies": {
     "@nuxt/kit": "^3.0.0-rc.8",
+    "@vueuse/integrations": "^9.2.0",
+    "@whoj/utils-core": "^0.1.0",
     "axios": "^0.27.2",
-    "axios-retry": "^3.3.1"
+    "axios-retry": "^3.3.1",
+    "defu": "^6.1.0"
   },
   "devDependencies": {
     "@nuxt/module-builder": "latest",
     "@nuxt/test-utils": "^3.0.0-rc.8",
     "@nuxtjs/eslint-config-typescript": "^11.0.0",
+    "@vueuse/core": "^9.2.0",
     "bumpp": "^8.2.1",
     "core-js": "^3.25.1",
     "cross-env": "^7.0.3",
@@ -49,6 +53,9 @@
     "vitest": "^0.23.2",
     "vue": "^3.2.39",
     "webpack": "^5.74.0"
+  },
+  "peerDependencies": {
+    "@vueuse/core": "^9.0.0"
   },
   "pnpm": {
     "peerDependencyRules": {

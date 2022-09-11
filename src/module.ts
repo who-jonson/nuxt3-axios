@@ -2,11 +2,9 @@ import { addPluginTemplate, createResolver, defineNuxtModule, addAutoImport, res
 import { name, version } from '../package.json';
 import type { ModuleOptions, NuxtAxiosInstance } from './options';
 
-export { ModuleOptions, NuxtAxiosInstance };
-
 const CONFIG_KEY = 'axios';
 
-export default defineNuxtModule({
+export default defineNuxtModule<ModuleOptions>({
   meta: {
     name,
     version,
@@ -27,7 +25,7 @@ export default defineNuxtModule({
     },
     proxy: true,
     retry: { retries: 3 }
-  } as ModuleOptions,
+  },
   setup(_moduleOptions, nuxt) {
     // Combine options
     const moduleOptions: ModuleOptions = {
@@ -160,3 +158,5 @@ export default defineNuxtModule({
     process.env._AXIOS_BASE_URL_ = options.baseURL;
   }
 });
+
+export type { ModuleOptions, NuxtAxiosInstance };
