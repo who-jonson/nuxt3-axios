@@ -26,7 +26,7 @@
     "test": "vitest",
     "clear": "rm -rf dist",
     "cleanup": "nuxi cleanup playground",
-    "postinstall": "run-s cleanup dev:prepare",
+    "prepare": "run-s cleanup dev:prepare",
     "lint": "eslint \"{**/*,*}.{ts,tsx,vue}\" --fix",
     "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground"
   },
