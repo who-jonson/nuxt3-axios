@@ -1,4 +1,4 @@
-import { addPluginTemplate, createResolver, defineNuxtModule, addAutoImport, resolveModule } from '@nuxt/kit';
+import { addPluginTemplate, createResolver, defineNuxtModule, addImports, resolveModule } from '@nuxt/kit';
 import { name, version } from '../package.json';
 import type { ModuleOptions, NuxtAxiosInstance } from './options';
 
@@ -145,7 +145,7 @@ export default defineNuxtModule<ModuleOptions>({
       options
     });
 
-    addAutoImport([
+    addImports([
       { name: 'useAxios', as: 'useAxios', from: resolveComposable('./axios') },
       { name: 'useAxiosGet', as: 'useAxiosGet', from: resolveComposable('./axios') },
       { name: 'useAxiosPut', as: 'useAxiosPut', from: resolveComposable('./axios') },
