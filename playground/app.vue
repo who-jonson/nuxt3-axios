@@ -1,9 +1,3 @@
-<template>
-  <div>
-    Nuxt module playground!
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { onMounted, useAxios } from '#imports';
 
@@ -21,3 +15,9 @@ onMounted(async() => {
   console.log(data, error);
 });
 </script>
+
+<template>
+  <div>
+    Nuxt module playground!
+  </div>
+</template>

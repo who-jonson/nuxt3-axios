@@ -3,14 +3,14 @@ import { useNuxtApp } from 'nuxt/app';
 import { objectPick } from '@whoj/utils-core';
 import type { AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
 import {
-  useAxios as _useAxios,
-  type UseAxiosOptions as _UseAxiosOptions
+  type UseAxiosOptions as _UseAxiosOptions,
+  useAxios as _useAxios
 } from '@vueuse/integrations/useAxios';
 
 export type UseAxiosRequestConfig<D = any> = Omit<AxiosRequestConfig<D>, 'transformResponse'>;
 
 export interface UseAxiosOptions extends _UseAxiosOptions {
-  transformer?: AxiosResponseTransformer | AxiosResponseTransformer[]
+  transformer?: AxiosResponseTransformer | AxiosResponseTransformer[];
 }
 
 export function useAxios<T = any, D = any>(url: string, config: UseAxiosRequestConfig<D> = {}, options: UseAxiosOptions = { immediate: true }) {

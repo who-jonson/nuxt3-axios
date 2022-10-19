@@ -1,4 +1,4 @@
-import { addPluginTemplate, createResolver, defineNuxtModule, addImports, resolveModule } from '@nuxt/kit';
+import { addImports, addPluginTemplate, createResolver, defineNuxtModule, resolveModule } from '@nuxt/kit';
 import { name, version } from '../package.json';
 import type { ModuleOptions, NuxtAxiosInstance } from './options';
 
@@ -10,7 +10,7 @@ export default defineNuxtModule<ModuleOptions>({
     version,
     configKey: CONFIG_KEY,
     compatibility: {
-      nuxt: '^3.0.0 || >=3.0.0-rc.8'
+      nuxt: '^3.0.0 || >=3.0.0-rc.12'
     }
   },
   defaults: {
@@ -52,7 +52,9 @@ export default defineNuxtModule<ModuleOptions>({
       'localhost';
 
     /* istanbul ignore if */
-    if (defaultHost === '0.0.0.0') { defaultHost = 'localhost'; }
+    if (defaultHost === '0.0.0.0') {
+      defaultHost = 'localhost';
+    }
 
     // Default prefix
     const prefix = process.env.API_PREFIX || moduleOptions.prefix || '/';
@@ -113,16 +115,24 @@ export default defineNuxtModule<ModuleOptions>({
     };
 
     /* istanbul ignore if */
-    if (process.env.API_URL) { options.baseURL = process.env.API_URL; }
+    if (process.env.API_URL) {
+      options.baseURL = process.env.API_URL;
+    }
 
     /* istanbul ignore if */
-    if (process.env.API_URL_BROWSER) { options.browserBaseURL = process.env.API_URL_BROWSER; }
+    if (process.env.API_URL_BROWSER) {
+      options.browserBaseURL = process.env.API_URL_BROWSER;
+    }
 
     // Default browserBaseURL
-    if (typeof options.browserBaseURL === 'undefined') { options.browserBaseURL = options.proxy ? prefix : options.baseURL; }
+    if (typeof options.browserBaseURL === 'undefined') {
+      options.browserBaseURL = options.proxy ? prefix : options.baseURL;
+    }
 
     // Normalize options
-    if (options.retry) { options.retry = {}; }
+    if (options.retry) {
+      options.retry = {};
+    }
 
     // Convert http:// to https:// if https option is on
     if (options.https) {

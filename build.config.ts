@@ -1,4 +1,4 @@
-import { promises as fs, existsSync } from 'node:fs';
+import { existsSync, promises as fs } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineBuildConfig } from 'unbuild';
@@ -9,11 +9,6 @@ export default defineBuildConfig({
   clean: true,
   declaration: true,
   outDir: 'dist',
-  rollup: {
-    esbuild: {
-      treeShaking: true
-    }
-  },
   hooks: {
     async 'rollup:done'() {
       const filePath = resolve(rootDir, 'dist/types.d.ts');
