@@ -1,4 +1,4 @@
-import { defineNuxtConfig } from 'nuxt';
+import { defineNuxtConfig } from 'nuxt/config';
 import Nuxt3Axios from '../src/module';
 
 export default defineNuxtConfig({
