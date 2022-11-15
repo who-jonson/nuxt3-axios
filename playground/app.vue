@@ -10,7 +10,7 @@ interface UserData {
 
 const { execute } = useAxios<UserData>('/api/error', {}, { immediate: false });
 
-onMounted(async() => {
+onMounted(async () => {
   const { data, error } = await execute('/api/error');
   console.log(data, error);
 });

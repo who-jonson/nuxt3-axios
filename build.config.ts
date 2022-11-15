@@ -10,7 +10,7 @@ export default defineBuildConfig({
   declaration: true,
   outDir: 'dist',
   hooks: {
-    async 'rollup:done'() {
+    'rollup:done': async function () {
       const filePath = resolve(rootDir, 'dist/types.d.ts');
       if (existsSync(filePath)) {
         const types = `export { ModuleOptions, NuxtAxiosInstance } from './module';

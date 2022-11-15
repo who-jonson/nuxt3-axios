@@ -77,6 +77,17 @@ export interface ModuleOptions {
     head?: Record<string, string>,
     post?: Record<string, string>,
     put?: Record<string, string>,
-    patch?: Record<string, string>,
+    patch?: Record<string, string>
   };
+  autoImport?: {
+    priority: number,
+    importMap?: {
+      useAxios?: string,
+      useAxiosGet?: string,
+      useAxiosPost?: string,
+      useAxiosPut?: string,
+      useAxiosPatch?: string,
+      useAxiosDelete?: string
+    }
+  } | false;
 }
