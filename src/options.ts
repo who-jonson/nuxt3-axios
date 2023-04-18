@@ -1,5 +1,5 @@
-import type { AxiosError, AxiosRequestConfig, AxiosResponse, AxiosStatic } from 'axios';
 import type { IAxiosRetryConfig } from 'axios-retry';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse, AxiosStatic } from 'axios';
 
 export interface NuxtAxiosInstance extends AxiosStatic {
   $request<T = any, D = any>(config: AxiosRequestConfig<D>): Promise<T>;
@@ -26,7 +26,7 @@ export interface NuxtAxiosInstance extends AxiosStatic {
   setBaseURL(baseURL: string): void;
   setHeader(
     name: string,
-    value?: string | false,
+    value?: null | string,
     scopes?: string | string[]
   ): void;
   setToken(
@@ -53,12 +53,12 @@ export interface NuxtAxiosInstance extends AxiosStatic {
   create(options?: AxiosRequestConfig): NuxtAxiosInstance;
 }
 
-export interface ModuleOptions {
+export interface NuxtAxiosOptions {
   baseURL?: string;
   baseUrl?: string;
   browserBaseURL?: string;
   browserBaseUrl?: string;
-  globalName?: string;
+  globalName: string;
   credentials?: boolean;
   debug?: boolean;
   host?: string;

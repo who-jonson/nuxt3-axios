@@ -5,10 +5,11 @@ module.exports = {
     node: true
   },
   extends: [
-    '@nuxtjs/eslint-config-typescript',
+    '@nuxt/eslint-config',
     '@whoj'
   ],
   rules: {
+    'import/order': 'off',
     'no-console': process.env.NODE_ENV !== 'production' ? 'off' : 'warning'
   }
 };
