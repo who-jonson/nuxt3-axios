@@ -23,11 +23,11 @@
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "prepublishOnly": "run-s clear lint build",
-    "release": "bumpp --tag --commit --push && pnpm publish",
+    "release": "pnpx changelogen@latest --release --patch && pnpm publish",
     "test": "vitest",
     "clear": "rm -rf dist",
     "cleanup": "nuxi cleanup playground",
-    "prepare": "run-s cleanup dev:prepare",
+    "stub": "run-s cleanup dev:prepare",
     "lint": "eslint \"{**/*,*}.{ts,tsx,vue}\" --fix",
     "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground"
   },
