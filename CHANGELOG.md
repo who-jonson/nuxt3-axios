@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v1.2.1
+
+[compare changes](https://github.com/who-jonson/nuxt3-axios/compare/v1.2.0...v1.2.1)
+
+
+### 🤖 CI
+
+  - Package.json scripts updated ([1117559](https://github.com/who-jonson/nuxt3-axios/commit/1117559))
+
+### ❤️  Contributors
+
+- Jonson Bhowmik ([@who-jonson](http://github.com/who-jonson))
+
 ## v1.2.0
 
 [compare changes](https://github.com/who-jonson/nuxt3-axios/compare/v1.1.0...v1.2.0)
