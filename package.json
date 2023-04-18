@@ -23,7 +23,7 @@
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "prepublishOnly": "run-s clear lint build",
-    "release": "pnpx changelogen@latest --release --patch && pnpm publish",
+    "release": "pnpx changelogen@latest --release",
     "test": "vitest",
     "clear": "rm -rf dist",
     "cleanup": "nuxi cleanup playground",
