@@ -254,3 +254,24 @@ function setupProgress(axios: NuxtAxiosInstance, globalName: string) {
   axios.defaults.onUploadProgress = onProgress;
   axios.defaults.onDownloadProgress = onProgress;
 }
+
+declare module '#app' {
+  interface NuxtApp {
+    $axios: NuxtAxiosInstance;
+  }
+}
+declare module 'nuxt/app' {
+  interface NuxtApp {
+    $axios: NuxtAxiosInstance;
+  }
+}
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    $axios: NuxtAxiosInstance;
+  }
+}
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $axios: NuxtAxiosInstance;
+  }
+}
