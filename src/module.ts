@@ -1,5 +1,4 @@
 import defu from 'defu';
-// import type { RuntimeConfig } from '@nuxt/schema';
 import { isObject, objectEntries } from '@whoj/utils-core';
 import { addImports, addPlugin, createResolver, defineNuxtModule } from '@nuxt/kit';
 
@@ -177,11 +176,6 @@ export default defineNuxtModule<NuxtAxiosOptions>({
 
     // Set _AXIOS_BASE_URL_ for dynamic SSR baseURL
     process.env._AXIOS_BASE_URL_ = options.baseURL;
-
-    // Injecting previously generated types
-    nuxt.hooks.hook('prepare:types', ({ references }) => {
-      references.push({ path: resolve(nuxt.options.buildDir, 'nuxt3-axios.d.ts') });
-    });
   }
 });
 
