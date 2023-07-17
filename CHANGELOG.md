@@ -1,6 +1,35 @@
 # Changelog
 
 
+## v1.4.0
+
+[compare changes](https://github.com/who-jonson/nuxt3-axios/compare/v1.2.1...v1.4.0)
+
+### 🚀 Enhancements
+
+- Added $postForm to AxiosInstance ([5afbeb6](https://github.com/who-jonson/nuxt3-axios/commit/5afbeb6))
+
+### 💅 Refactors
+
+- **deps:** Modified playground config as well as build config ([65c86d4](https://github.com/who-jonson/nuxt3-axios/commit/65c86d4))
+
+### 📦 Build
+
+- **deps:** Packages upgrade ([5fefe22](https://github.com/who-jonson/nuxt3-axios/commit/5fefe22))
+
+### 🏡 Chore
+
+- **release:** V1.3.0 ([5ff9ad5](https://github.com/who-jonson/nuxt3-axios/commit/5ff9ad5))
+- **release:** V1.3.0 ([67e3a20](https://github.com/who-jonson/nuxt3-axios/commit/67e3a20))
+
+### 🤖 CI
+
+- Package.json scripts updated ([f558281](https://github.com/who-jonson/nuxt3-axios/commit/f558281))
+
+### ❤️  Contributors
+
+- Jonson Bhowmik ([@who-jonson](http://github.com/who-jonson))
+
 ## v1.3.0
 
 [compare changes](https://github.com/who-jonson/nuxt3-axios/compare/v1.2.1...v1.3.0)
