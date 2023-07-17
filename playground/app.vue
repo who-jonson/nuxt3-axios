@@ -8,10 +8,10 @@ interface UserData {
   completed: boolean;
 }
 
-const { execute } = useAxios<UserData>('/api/error', {}, { immediate: false });
+const { execute } = useAxios<UserData>('/todos/1', {}, { immediate: false });
 
 onMounted(async () => {
-  const { data, error } = await execute('/api/error');
+  const { data, error } = await execute();
   console.log(data, error);
 });
 </script>

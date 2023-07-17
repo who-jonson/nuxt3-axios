@@ -1,12 +1,22 @@
 import { defineNuxtConfig } from 'nuxt/config';
-import Nuxt3Axios from '../src/module';
 
 export default defineNuxtConfig({
   modules: [
-    Nuxt3Axios
+    './../src/module'
   ],
   axios: {
     credentials: true,
-    debug: true
+    debug: true,
+    autoImport: {
+      enabled: true
+    }
+  },
+
+  nitro: {
+    routeRules: {
+      '/todos/**': {
+        proxy: 'https://jsonplaceholder.typicode.com/todos/**'
+      }
+    }
   }
 });

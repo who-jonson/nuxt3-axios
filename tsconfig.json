@@ -1,13 +1,9 @@
 {
   "extends": "./playground/.nuxt/tsconfig.json",
   "compilerOptions": {
-    "module": "ESNext",
     "noImplicitAny": false,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "moduleResolution": "Bundler"
-  },
-  "include": [
-    "./**/*"
-  ]
+  }
 }
