@@ -1,11 +1,11 @@
-import defu from 'defu';
-import { isObject, objectEntries } from '@whoj/utils-core';
-import { addImports, addPlugin, createResolver, defineNuxtModule } from '@nuxt/kit';
+import { defu } from 'defu';
+import { getObjProp, objectEntries, objectPick, setObjProp } from '@whoj/utils-core';
+import { addImports, addPlugin, addTypeTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit';
 
 import { name, version } from '../package.json';
 import type { NuxtAxiosInstance, NuxtAxiosOptions } from './options';
 
-const CONFIG_KEY = 'axios';
+const CONFIG_KEY = 'axios' as const;
 
 export default defineNuxtModule<NuxtAxiosOptions>({
   meta: {
@@ -13,12 +13,14 @@ export default defineNuxtModule<NuxtAxiosOptions>({
     version,
     configKey: CONFIG_KEY,
     compatibility: {
-      nuxt: '^3.0.0'
+      nuxt: '^3.6'
     }
   },
   defaults: ({ options }) => ({
+    alias: 'axios',
     autoImport: {
-      importMap: {
+      enabled: false,
+      imports: {
         useAxios: 'useAxios',
         useAxiosGet: 'useAxiosGet',
         useAxiosPost: 'useAxiosPost',
@@ -28,7 +30,7 @@ export default defineNuxtModule<NuxtAxiosOptions>({
       },
       priority: 1
     },
-    credentials: true,
+    credentials: false,
     headers: {
       common: {
         'crossDomain': 'true',
@@ -37,12 +39,13 @@ export default defineNuxtModule<NuxtAxiosOptions>({
         'X-Requested-With': 'XMLHttpRequest'
       }
     },
-    proxy: true,
-    retry: { retries: 3 },
+    proxy: false,
+    retry: false, // { retries: 3 },
     browserBaseURL: undefined,
     debug: false,
     progress: true,
-    proxyHeaders: true, // @ts-ignore
+    proxyHeaders: true,
+    // @ts-ignore
     globalName: options.globalName || 'nuxt',
     proxyHeadersIgnore: [
       'accept',
@@ -59,19 +62,21 @@ export default defineNuxtModule<NuxtAxiosOptions>({
       'x-forwarded-proto'
     ]
   }),
-  setup(_moduleOptions, nuxt) {
-    // Combine options
-    const moduleOptions: NuxtAxiosOptions = defu(
-      _moduleOptions,
-      (nuxt.options.runtimeConfig.public && nuxt.options.runtimeConfig.public[CONFIG_KEY])
+  setup(_options, nuxt) {
+    const logger = useLogger('nuxt:axios');
+    // Combined options
+    const moduleOptions = defu(
+      _options,
+      getObjProp(nuxt.options.runtimeConfig, CONFIG_KEY, {}),
+      getObjProp(nuxt.options.runtimeConfig.public, CONFIG_KEY, {})
     );
 
     // Default port
     const defaultPort
       = process.env.API_PORT
       || moduleOptions.port
+      || process.env.NITRO_PORT
       || process.env.PORT
-      || process.env.npm_package_config_nuxt_port
       // @ts-ignore
       || (nuxt.options.server && nuxt.options.server.port)
       || 3000;
@@ -81,7 +86,7 @@ export default defineNuxtModule<NuxtAxiosOptions>({
       = process.env.API_HOST
       || moduleOptions.host
       || process.env.HOST
-      || process.env.npm_package_config_nuxt_host
+      || process.env.NITRO_HOST
       // @ts-ignore
       || (nuxt.options.server && nuxt.options.server.host)
       || 'localhost';
@@ -121,21 +126,22 @@ export default defineNuxtModule<NuxtAxiosOptions>({
     }
 
     // Apply defaults
-    const options = {
+    const options = defu(moduleOptions, {
       baseURL: `http://${defaultHost}:${defaultPort}${prefix}`,
       https,
-      headers,
-      ...moduleOptions
-    };
+      headers
+    });
 
     /* istanbul ignore if */
-    if (process.env.API_URL) {
-      options.baseURL = process.env.API_URL;
+    const API_URL = process.env.API_URL || process.env.NUXT_AXIOS_BASE_URL;
+    if (API_URL) {
+      options.baseURL = process.env.API_URL!;
     }
 
     /* istanbul ignore if */
-    if (process.env.API_URL_BROWSER) {
-      options.browserBaseURL = process.env.API_URL_BROWSER;
+    const API_URL_BROWSER = process.env.API_URL_BROWSER || process.env.NUXT_PUBLIC_AXIOS_BROWSER_BASE_URL;
+    if (API_URL_BROWSER) {
+      options.browserBaseURL = API_URL_BROWSER;
     }
 
     // Default browserBaseURL
@@ -155,39 +161,83 @@ export default defineNuxtModule<NuxtAxiosOptions>({
       options.browserBaseURL = https(options.browserBaseURL);
     }
 
-    nuxt.options.runtimeConfig.axiosModule = defu(nuxt.options.runtimeConfig.axiosModule, options) as Omit<NuxtAxiosOptions, 'autoImport'>;
+    setObjProp(nuxt.options.runtimeConfig, CONFIG_KEY, objectPick(options, ['baseUrl', 'baseURL']));
+    setObjProp(nuxt.options.runtimeConfig.public, CONFIG_KEY, { ...options, baseUrl: undefined, baseURL: undefined });
 
     // resolver
     const { resolve } = createResolver(import.meta.url);
+
+    nuxt.options.build.transpile.push(resolve('./runtime'));
 
     // Register plugin
     addPlugin(resolve('./runtime/plugin'));
 
     // imports / composables
-    if (isObject(options.autoImport)) {
-      addImports(objectEntries<Record<string, string>>(options.autoImport.importMap!).map(([name, as]) => ({
+    if (options.autoImport?.enabled) {
+      addImports(objectEntries<Record<string, string>>(options.autoImport.imports || {}).map(([name, as]) => ({
         name,
         as,
-        // @ts-ignore
         priority: options.autoImport?.priority,
         from: resolve('./runtime/composables/axios')
       })));
     }
 
-    // Set _AXIOS_BASE_URL_ for dynamic SSR baseURL
-    process.env._AXIOS_BASE_URL_ = options.baseURL;
+    // Set NUXT_AXIOS_BASE_URL for dynamic SSR baseURL
+    process.env.NUXT_AXIOS_BASE_URL = process.env._AXIOS_BASE_URL_ = options.baseURL;
+
+    logger.debug(`baseURL: ${options.baseURL}`);
+    logger.debug(`browserBaseURL: ${options.browserBaseURL}`);
+
+    addTypeTemplate({
+      filename: 'types/nuxt3-axios.d.ts',
+      getContents: () => `// Generated by @whoj/nuxt3-axios
+
+import type { AxiosStatic } from 'axios';
+import type { NuxtAxiosInstance, NuxtAxiosOptions } from '@whoj/nuxt3-axios';
+
+declare module 'axios' {
+  export interface AxiosInstance {
+    CancelToken: AxiosStatic['CancelToken'];
+    isAxiosError: AxiosStatic['isAxiosError'];
+    isCancel: AxiosStatic['isCancel'];
+  }
+
+  export interface AxiosRequestConfig {
+    progress?: boolean;
+  }
+}
+
+declare module 'nuxt/schema' {
+  interface RuntimeConfig {
+    axios: Pick<NuxtAxiosOptions, 'baseUrl' | 'baseURL'>;
+    public: {
+      axios: Omit<NuxtAxiosOptions, 'autoImport' | 'baseUrl' | 'baseURL'>
+    }
+  }
+}
+
+declare module '#app' {
+  interface NuxtApp {
+    $${options.alias}: NuxtAxiosInstance;
+  }
+}
+
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    $${options.alias}: NuxtAxiosInstance;
+  }
+}
+
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $${options.alias}: NuxtAxiosInstance;
+  }
+}
+
+export {};
+`
+    });
   }
 });
 
 export type { NuxtAxiosOptions, NuxtAxiosInstance };
-
-declare module 'nuxt/schema' {
-  interface RuntimeConfig {
-    axiosModule: Omit<NuxtAxiosOptions, 'autoImport'>;
-  }
-}
-declare module '@nuxt/schema' {
-  interface RuntimeConfig {
-    axiosModule: Omit<NuxtAxiosOptions, 'autoImport'>;
-  }
-}

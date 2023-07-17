@@ -1,11 +1,9 @@
 import defu from 'defu';
 import { useNuxtApp } from 'nuxt/app';
 import { objectPick } from '@whoj/utils-core';
+import { useAxios as _useAxios } from '@vueuse/integrations/useAxios';
 import type { AxiosRequestConfig, AxiosResponseTransformer } from 'axios';
-import {
-  type UseAxiosOptions as _UseAxiosOptions,
-  useAxios as _useAxios
-} from '@vueuse/integrations/useAxios';
+import type { UseAxiosOptions as _UseAxiosOptions } from '@vueuse/integrations/useAxios';
 
 export type UseAxiosRequestConfig<D = any> = Omit<AxiosRequestConfig<D>, 'transformResponse'>;
 

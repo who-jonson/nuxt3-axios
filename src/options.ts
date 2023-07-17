@@ -12,6 +12,11 @@ export interface NuxtAxiosInstance extends AxiosStatic {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<T>;
+  $postForm<T = any, D = any>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>
+  ): Promise<T>;
   $put<T = any, D = any>(
     url: string,
     data?: D,
@@ -54,6 +59,7 @@ export interface NuxtAxiosInstance extends AxiosStatic {
 }
 
 export interface NuxtAxiosOptions {
+  alias?: string;
   baseURL?: string;
   baseUrl?: string;
   browserBaseURL?: string;
@@ -66,7 +72,7 @@ export interface NuxtAxiosOptions {
   progress?: boolean;
   proxyHeaders?: boolean;
   proxyHeadersIgnore?: string[];
-  proxy?: boolean;
+  proxy?: AxiosRequestConfig['proxy'];
   port?: string | number;
   retry?: boolean | IAxiosRetryConfig;
   https?: boolean;
@@ -80,8 +86,9 @@ export interface NuxtAxiosOptions {
     patch?: Record<string, string>
   };
   autoImport?: {
-    priority: number,
-    importMap?: {
+    enabled?: boolean,
+    priority?: number,
+    imports?: {
       useAxios?: string,
       useAxiosGet?: string,
       useAxiosPost?: string,
@@ -89,5 +96,5 @@ export interface NuxtAxiosOptions {
       useAxiosPatch?: string,
       useAxiosDelete?: string
     }
-  } | false;
+  };
 }
