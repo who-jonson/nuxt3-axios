@@ -5,7 +5,6 @@ module.exports = {
     node: true
   },
   extends: [
-    '@nuxt/eslint-config',
     '@whoj'
   ],
   rules: {

@@ -9,6 +9,11 @@
       "types": "./dist/types.d.ts",
       "import": "./dist/module.mjs",
       "require": "./dist/module.cjs"
+    },
+    "./composables": {
+      "types": "./dist/runtime/composables/axios.d.ts",
+      "import": "./dist/runtime/composables/axios.mjs",
+      "require": "./dist/runtime/composables/axios.cjs"
     }
   },
   "main": "./dist/module.cjs",
@@ -29,47 +34,46 @@
     "cleanup": "nuxi cleanup playground",
     "stub": "run-s cleanup dev:prepare",
     "lint": "eslint \"{**/*,*}.{ts,tsx,vue}\" --fix",
-    "dev:prepare": "nuxt-module-build --stub && nuxi prepare playground"
+    "dev:prepare": "nuxi prepare playground"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.0.0",
-    "@vueuse/integrations": "^10.0.2",
-    "@whoj/utils-core": "^1.7.3",
-    "axios": "^1.3.5",
-    "axios-retry": "^3.4.0",
+    "@nuxt/kit": "^3.6.3",
+    "@vueuse/integrations": "^10.2.1",
+    "@whoj/utils-core": "^1.7.5",
+    "axios": "^1.4.0",
+    "axios-retry": "^3.5.1",
     "defu": "^6.1.2"
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^0.1.1",
-    "@nuxt/module-builder": "^0.3.0",
-    "@nuxt/test-utils": "3.4.1",
-    "@types/node": "^18.15.11",
-    "@vueuse/core": "^10.0.2",
-    "@whoj/eslint-config": "^1.4.0",
-    "bumpp": "^9.1.0",
-    "core-js": "^3.30.1",
+    "@nuxt/module-builder": "^0.4.0",
+    "@nuxt/test-utils": "3.6.3",
+    "@types/node": "^18.16.19",
+    "@vueuse/core": "^10.2.1",
+    "@whoj/eslint-config": "^1.4.2",
+    "bumpp": "^9.1.1",
+    "core-js": "^3.31.1",
     "cross-env": "^7.0.3",
-    "eslint": "^8.38.0",
+    "esbuild": "^0.18.13",
+    "eslint": "^8.45.0",
     "npm-run-all": "^4.1.5",
-    "nuxt": "^3.4.1",
-    "typescript": "^5.0.4",
-    "vite": "^4.2.1",
-    "vitest": "^0.30.1",
-    "vue": "^3.2.47"
+    "nuxt": "^3.6.3",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.4",
+    "vitest": "^0.33.0",
+    "vue": "^3.3.4"
   },
   "peerDependencies": {
-    "@nuxt/schema": "^3.0.0",
-    "@vueuse/core": "^9 || ^10"
+    "@nuxt/schema": "^3.6",
+    "@vueuse/core": "^^10"
   },
   "pnpm": {
     "overrides": {
-      "esbuild": "^0.17.17",
-      "vue-demi": "^0.14.0",
-      "typescript": "$typescript",
-      "sourcemap-codec": "npm:@jridgewell/sourcemap-codec@latest"
+      "esbuild": "$esbuild",
+      "typescript": "$typescript"
     }
   },
-  "packageManager": "pnpm@8.2.0",
+  "packageManager": "pnpm@8.6.8",
   "sideEffects": false,
   "bugs": {
     "url": "https://github.com/who-jonson/nuxt3-axios/issues"
