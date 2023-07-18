@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.4.1
+
+[compare changes](https://github.com/who-jonson/nuxt3-axios/compare/v1.4.0...v1.4.1)
+
+### 🩹 Fixes
+
+- Axios-Retry issue fixed ([7f617c6](https://github.com/who-jonson/nuxt3-axios/commit/7f617c6))
+
+### ❤️  Contributors
+
+- Jonson Bhowmik ([@who-jonson](http://github.com/who-jonson))
+
 ## v1.4.0
 
 [compare changes](https://github.com/who-jonson/nuxt3-axios/compare/v1.2.1...v1.4.0)

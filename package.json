@@ -1,6 +1,6 @@
 {
   "name": "@whoj/nuxt3-axios",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "An alternative to @nuxtjs/axios for Nuxt 3",
   "license": "MIT",
   "type": "module",
