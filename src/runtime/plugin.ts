@@ -4,10 +4,9 @@ import { getHeaders } from 'h3';
 import axiosRetry from 'axios-retry';
 import type { CreateAxiosDefaults } from 'axios';
 import { isBoolean, isClient } from '@whoj/utils-core';
-import { createError, defineNuxtPlugin, useRuntimeConfig } from '#app';
+import { createError, defineNuxtPlugin } from '#app';
 
 import type { NuxtAxiosInstance, NuxtAxiosOptions } from '../options';
-import * as process from 'process';
 
 const log = (level, ...messages) => console[level]('[Axios]', ...messages);
 
@@ -64,12 +63,58 @@ const axiosExtra: Partial<NuxtAxiosInstance> = {
 };
 
 // Request helpers ($get, $post, ...)
-for (const method of ['request', 'delete', 'get', 'head', 'options', 'post', 'postForm', 'put', 'patch']) {
+for (const method of ['request', 'delete', 'get', 'head', 'options', 'post', 'put', 'patch', 'postForm', 'putForm', 'patchForm']) {
   axiosExtra[`$${method}`] = function () {
     // eslint-disable-next-line prefer-spread,prefer-rest-params
     return this[method].apply(this, arguments).then(res => res && res.data).catch(err => createError(err.response || err));
   };
 }
+
+export default defineNuxtPlugin(({ $config, ssrContext }) => {
+  // runtimeConfig
+  const options = $config.public.axios;
+
+  // baseURL
+  const baseURL = process.client
+    // @ts-ignore
+    ? (options?.browserBaseURL || options?.browserBaseUrl || '')
+    // @ts-ignore
+    : ($config.axios?.baseURL || $config.axios?.baseUrl || process.env?.API_URL || process.env?._AXIOS_BASE_URL_ || '');
+
+  const headers = {
+    ...(options.headers || {})
+  };
+
+  // Create fresh objects for all default header scopes
+  // Axios creates only one which is shared across SSR requests!
+  // https://axios-http.com/docs/config_defaults
+  const axiosOptions = {
+    baseURL,
+    headers
+  };
+
+  if (options.proxyHeaders && process.server && ssrContext?.event) {
+    // Proxy SSR request headers
+    const reqHeaders = getHeaders(ssrContext.event);
+    for (const h of (options.proxyHeadersIgnore || [])) {
+      delete reqHeaders[h];
+    }
+    axiosOptions.headers.common = { ...reqHeaders, ...axiosOptions.headers?.common };
+  }
+
+  if (process.server) {
+    // Don't accept brotli encoding because Node can't parse it
+    axiosOptions.headers.common['accept-encoding'] = 'gzip, deflate';
+  }
+  // @ts-ignore
+  const axios = createAxiosInstance(axiosOptions, options);
+
+  return {
+    provide: {
+      [options.alias]: axios
+    }
+  };
+});
 
 function extendAxiosInstance(axios) {
   for (const key in axiosExtra) {
@@ -103,7 +148,12 @@ function createAxiosInstance(axiosOptions: CreateAxiosDefaults, options?: NuxtAx
     setupProgress(axios, options?.globalName);
   }
   if (options?.retry) {
-    axiosRetry(axios, !isBoolean(options.retry) ? options.retry : undefined);
+    axiosRetry(
+      axios,
+      !isBoolean(options.retry)
+        ? options.retry
+        : { retryDelay: axiosRetry.exponentialDelay }
+    );
   }
 
   return axios;
@@ -217,49 +267,3 @@ function setupProgress(axios: NuxtAxiosInstance, globalName: string) {
   axios.defaults.onUploadProgress = onProgress;
   axios.defaults.onDownloadProgress = onProgress;
 }
-
-export default defineNuxtPlugin(({ provide, ssrContext }) => {
-  // runtimeConfig
-  const { axios: runtimeConfig } = useRuntimeConfig();
-  const { axios: options } = useRuntimeConfig().public;
-
-  // baseURL
-  const baseURL = process.client
-    // @ts-ignore
-    ? (options?.browserBaseURL || options?.browserBaseUrl || '')
-    // @ts-ignore
-    : (runtimeConfig?.baseURL || runtimeConfig?.baseUrl || process.env?.NUXT_AXIOS_BASE_URL || process.env?._AXIOS_BASE_URL_ || '');
-
-  const headers = {
-    ...(options.headers || {})
-  };
-
-  // Create fresh objects for all default header scopes
-  // Axios creates only one which is shared across SSR requests!
-  // https://axios-http.com/docs/config_defaults
-  const axiosOptions = {
-    baseURL,
-    headers
-  };
-
-  if (options.proxyHeaders) {
-    // Proxy SSR request headers
-    if (process.server && ssrContext?.event) {
-      const reqHeaders = getHeaders(ssrContext.event);
-      for (const h of (options.proxyHeadersIgnore || [])) {
-        delete reqHeaders[h];
-      }
-      axiosOptions.headers.common = { ...reqHeaders, ...axiosOptions.headers?.common };
-    }
-  }
-
-  if (process.server) {
-    // Don't accept brotli encoding because Node can't parse it
-    axiosOptions.headers.common['accept-encoding'] = 'gzip, deflate';
-  }
-  // @ts-ignore
-  const axios = createAxiosInstance(axiosOptions, options);
-
-  // @ts-ignore
-  provide(options.alias, axios);
-});

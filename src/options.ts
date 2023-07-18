@@ -1,4 +1,3 @@
-import type { IAxiosRetryConfig } from 'axios-retry';
 import type { AxiosError, AxiosRequestConfig, AxiosResponse, AxiosStatic } from 'axios';
 
 export interface NuxtAxiosInstance extends AxiosStatic {
@@ -12,17 +11,27 @@ export interface NuxtAxiosInstance extends AxiosStatic {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<T>;
-  $postForm<T = any, D = any>(
-    url: string,
-    data?: D,
-    config?: AxiosRequestConfig<D>
-  ): Promise<T>;
   $put<T = any, D = any>(
     url: string,
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<T>;
   $patch<T = any, D = any>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>
+  ): Promise<T>;
+  $postForm<T = any, D = any>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>
+  ): Promise<T>;
+  $putForm<T = any, D = any>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>
+  ): Promise<T>;
+  $patchForm<T = any, D = any>(
     url: string,
     data?: D,
     config?: AxiosRequestConfig<D>
@@ -74,7 +83,7 @@ export interface NuxtAxiosOptions {
   proxyHeadersIgnore?: string[];
   proxy?: AxiosRequestConfig['proxy'];
   port?: string | number;
-  retry?: boolean | IAxiosRetryConfig;
+  retry?: AxiosRequestConfig['axios-retry'];
   https?: boolean;
   headers?: {
     common?: Record<string, string>,
@@ -97,4 +106,5 @@ export interface NuxtAxiosOptions {
       useAxiosDelete?: string
     }
   };
+  [p: string]: any;
 }
