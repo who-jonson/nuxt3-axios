@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.5.0
+
+[compare changes](https://github.com/who-jonson/nuxt3-axios/compare/v1.4.1...v1.5.0)
+
+### 🚀 Enhancements
+
+- Agent options added ([5e51cdd](https://github.com/who-jonson/nuxt3-axios/commit/5e51cdd))
+
+### ❤️ Contributors
+
+- Jonson Bhowmik ([@who-jonson](http://github.com/who-jonson))
+
 ## v1.4.1
 
 [compare changes](https://github.com/who-jonson/nuxt3-axios/compare/v1.4.0...v1.4.1)
