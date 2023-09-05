@@ -1,9 +1,12 @@
+import http from 'http';
+import https from 'https';
 import Axios from 'axios';
 import { defu } from 'defu';
 import { getHeaders } from 'h3';
 import axiosRetry from 'axios-retry';
 import type { CreateAxiosDefaults } from 'axios';
 import { isBoolean, isClient } from '@whoj/utils-core';
+// @ts-ignore
 import { createError, defineNuxtPlugin } from '#app';
 
 import type { NuxtAxiosInstance, NuxtAxiosOptions } from '../options';
@@ -91,7 +94,7 @@ export default defineNuxtPlugin(({ $config, ssrContext }) => {
   const axiosOptions = {
     baseURL,
     headers
-  };
+  } as CreateAxiosDefaults;
 
   if (options.proxyHeaders && process.server && ssrContext?.event) {
     // Proxy SSR request headers
@@ -99,12 +102,22 @@ export default defineNuxtPlugin(({ $config, ssrContext }) => {
     for (const h of (options.proxyHeadersIgnore || [])) {
       delete reqHeaders[h];
     }
-    axiosOptions.headers.common = { ...reqHeaders, ...axiosOptions.headers?.common };
+    axiosOptions.headers!.common = { ...reqHeaders, ...axiosOptions.headers?.common };
   }
 
   if (process.server) {
     // Don't accept brotli encoding because Node can't parse it
-    axiosOptions.headers.common['accept-encoding'] = 'gzip, deflate';
+    axiosOptions.headers!.common['accept-encoding'] = 'gzip, deflate';
+    if ($config.axios.agents) { // @ts-ignore
+      if ($config.axios.agents.http) { // @ts-ignore
+        const Agent = $config.axios.agents.http.class || http.Agent; // @ts-ignore
+        axiosOptions.httpAgent = new Agent($config.axios.agents.http.options);
+      }
+      if ($config.axios.agents.https) { // @ts-ignore
+        const Agent = $config.axios.agents.https.class || https.Agent;
+        axiosOptions.httpsAgent = new Agent($config.axios.agents.https.options);
+      }
+    }
   }
   // @ts-ignore
   const axios = createAxiosInstance(axiosOptions, options);

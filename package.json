@@ -10,15 +10,22 @@
       "import": "./dist/module.mjs",
       "require": "./dist/module.cjs"
     },
-    "./composables": {
-      "types": "./dist/runtime/composables/axios.d.ts",
-      "import": "./dist/runtime/composables/axios.mjs",
-      "require": "./dist/runtime/composables/axios.cjs"
-    }
+    "./*": [
+      "./dist/*",
+      "./dist/*.d.ts"
+    ]
   },
   "main": "./dist/module.cjs",
   "module": "./dist/module.mjs",
   "types": "./dist/types.d.ts",
+  "typesVersions": {
+    "<=4.9": {
+      "*": [
+        "./dist/*",
+        "./dist/index.d.ts"
+      ]
+    }
+  },
   "files": [
     "dist",
     "*.d.ts"
@@ -37,29 +44,27 @@
     "dev:prepare": "nuxi prepare playground"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.6.3",
-    "@vueuse/integrations": "^10.2.1",
+    "@nuxt/kit": "^3.7.0",
+    "@vueuse/integrations": "^10.4.1",
     "@whoj/utils-core": "^1.7.5",
-    "axios": "^1.4.0",
-    "axios-retry": "^3.5.1",
+    "axios": "^1.5.0",
+    "axios-retry": "^3.7.0",
     "defu": "^6.1.2"
   },
   "devDependencies": {
-    "@nuxt/eslint-config": "^0.1.1",
-    "@nuxt/module-builder": "^0.4.0",
-    "@nuxt/test-utils": "3.6.3",
-    "@types/node": "^18.16.19",
-    "@vueuse/core": "^10.2.1",
+    "@nuxt/module-builder": "^0.5.1",
+    "@nuxt/test-utils": "3.7.0",
+    "@types/node": "^18.17.14",
+    "@vueuse/core": "^10.4.1",
     "@whoj/eslint-config": "^1.4.2",
-    "bumpp": "^9.1.1",
-    "core-js": "^3.31.1",
+    "bumpp": "^9.2.0",
+    "core-js": "^3.32.1",
     "cross-env": "^7.0.3",
-    "esbuild": "^0.18.13",
-    "eslint": "^8.45.0",
+    "eslint": "^8.48.0",
     "npm-run-all": "^4.1.5",
-    "nuxt": "^3.6.3",
-    "typescript": "^5.1.6",
-    "vite": "^4.4.4",
+    "nuxt": "^3.7.0",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9",
     "vitest": "^0.33.0",
     "vue": "^3.3.4"
   },
@@ -69,11 +74,10 @@
   },
   "pnpm": {
     "overrides": {
-      "esbuild": "$esbuild",
       "typescript": "$typescript"
     }
   },
-  "packageManager": "pnpm@8.6.8",
+  "packageManager": "pnpm@8.7.1",
   "sideEffects": false,
   "bugs": {
     "url": "https://github.com/who-jonson/nuxt3-axios/issues"

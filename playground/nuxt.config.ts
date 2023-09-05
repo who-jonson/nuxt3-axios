@@ -9,6 +9,13 @@ export default defineNuxtConfig({
     debug: true,
     autoImport: {
       enabled: true
+    },
+    agents: {
+      https: {
+        options: {
+          rejectUnauthorized: false
+        }
+      }
     }
   },
 

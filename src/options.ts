@@ -106,5 +106,15 @@ export interface NuxtAxiosOptions {
       useAxiosDelete?: string
     }
   };
+  agents?: {
+    http?: {
+      class?: any,
+      options?: any
+    },
+    https?: {
+      class?: any,
+      options?: any
+    }
+  };
   [p: string]: any;
 }

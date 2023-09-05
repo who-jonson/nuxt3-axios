@@ -13,7 +13,8 @@ export default defineNuxtModule<NuxtAxiosOptions>({
     version,
     configKey: CONFIG_KEY,
     compatibility: {
-      nuxt: '^3.6'
+      bridge: false,
+      nuxt: '^3.7.0'
     }
   },
   defaults: ({ options }) => ({
@@ -155,12 +156,16 @@ export default defineNuxtModule<NuxtAxiosOptions>({
     // Convert http:// to https:// if https option is on
     if (options.https) {
       const https = (s: string) => s.replace('http://', 'https://');
-      options.baseURL = https(options.baseURL);
-      options.browserBaseURL = https(options.browserBaseURL);
+      if (options.baseURL) {
+        options.baseURL = https(options.baseURL);
+      }
+      if (options.browserBaseURL) {
+        options.browserBaseURL = https(options.browserBaseURL);
+      }
     }
 
-    setObjProp(nuxt.options.runtimeConfig, CONFIG_KEY, objectPick(options, ['baseUrl', 'baseURL']));
-    setObjProp(nuxt.options.runtimeConfig.public, CONFIG_KEY, { ...options, baseUrl: undefined, baseURL: undefined });
+    setObjProp(nuxt.options.runtimeConfig, CONFIG_KEY, objectPick(options, ['agents', 'baseUrl', 'baseURL']));
+    setObjProp(nuxt.options.runtimeConfig.public, CONFIG_KEY, { ...options, baseUrl: undefined, baseURL: undefined, agents: undefined });
 
     // resolver
     const { resolve } = createResolver(import.meta.url);
@@ -214,11 +219,11 @@ declare module 'nuxt/schema' {
   }
 
   interface RuntimeConfig {
-    axios: Pick<NuxtAxiosOptions, 'baseUrl' | 'baseURL'>;
+    axios: Pick<NuxtAxiosOptions, 'agents' | 'baseUrl' | 'baseURL'>;
   }
 
   interface PublicRuntimeConfig {
-    axios: Omit<NuxtAxiosOptions, 'autoImport' | 'baseUrl' | 'baseURL'>
+    axios: Omit<NuxtAxiosOptions, 'agents' | 'autoImport' | 'baseUrl' | 'baseURL'>
   }
 }
 
