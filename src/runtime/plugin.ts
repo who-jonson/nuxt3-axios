@@ -4,10 +4,9 @@ import Axios from 'axios';
 import { defu } from 'defu';
 import { getHeaders } from 'h3';
 import axiosRetry from 'axios-retry';
-import type { CreateAxiosDefaults } from 'axios';
-import { isBoolean, isClient } from '@whoj/utils-core';
-// @ts-ignore
+import type { CreateAxiosDefaults } from 'axios'; // @ts-ignore
 import { createError, defineNuxtPlugin } from '#app';
+import { isBoolean, isClient } from '@whoj/utils-core';
 
 import type { NuxtAxiosInstance, NuxtAxiosOptions } from '../options';
 
@@ -78,7 +77,8 @@ export default defineNuxtPlugin(({ $config, ssrContext }) => {
   const options = $config.public.axios;
 
   // baseURL
-  const baseURL = process.client
+  // @ts-ignore
+  const baseURL = import.meta.client
     // @ts-ignore
     ? (options?.browserBaseURL || options?.browserBaseUrl || '')
     // @ts-ignore
@@ -95,8 +95,8 @@ export default defineNuxtPlugin(({ $config, ssrContext }) => {
     baseURL,
     headers
   } as CreateAxiosDefaults;
-
-  if (options.proxyHeaders && process.server && ssrContext?.event) {
+  // @ts-ignore
+  if (options.proxyHeaders && import.meta.server && ssrContext?.event) {
     // Proxy SSR request headers
     const reqHeaders = getHeaders(ssrContext.event);
     for (const h of (options.proxyHeadersIgnore || [])) {
@@ -104,8 +104,8 @@ export default defineNuxtPlugin(({ $config, ssrContext }) => {
     }
     axiosOptions.headers!.common = { ...reqHeaders, ...axiosOptions.headers?.common };
   }
-
-  if (process.server) {
+  // @ts-ignore
+  if (import.meta.server) {
     // Don't accept brotli encoding because Node can't parse it
     axiosOptions.headers!.common['accept-encoding'] = 'gzip, deflate';
     if ($config.axios.agents) { // @ts-ignore
@@ -129,7 +129,7 @@ export default defineNuxtPlugin(({ $config, ssrContext }) => {
   };
 });
 
-function extendAxiosInstance(axios) {
+function extendAxiosInstance(axios: NuxtAxiosInstance) {
   for (const key in axiosExtra) {
     axios[key] = axiosExtra[key].bind(axios);
   }
@@ -172,7 +172,7 @@ function createAxiosInstance(axiosOptions: CreateAxiosDefaults, options?: NuxtAx
   return axios;
 }
 
-function setupDebugInterceptor(axios) {
+function setupDebugInterceptor(axios: NuxtAxiosInstance) {
   // request
   axios.onRequestError((error) => {
     log('error', 'Request error:', error);
@@ -186,10 +186,10 @@ function setupDebugInterceptor(axios) {
     log(
       'info',
       `[${res.status} ${res.statusText}]`,
-      `[${res.config.method.toUpperCase()}]`,
+      `[${res.config.method!.toUpperCase()}]`,
       res.config.url);
-
-    if (process.client) {
+    // @ts-ignore
+    if (import.meta.client) {
       console.log(res);
     } else {
       console.log(JSON.stringify(res.data, undefined, 2));
@@ -199,19 +199,19 @@ function setupDebugInterceptor(axios) {
   });
 }
 
-function setupCredentialsInterceptor(axios) {
+function setupCredentialsInterceptor(axios: NuxtAxiosInstance) {
   // Send credentials only to relative and API Backend requests
   axios.onRequest((config) => {
     if (config.withCredentials === undefined) {
-      if (!/^https?:\/\//i.test(config.url) || config.url.indexOf(config.baseURL) === 0) {
+      if (!/^https?:\/\//i.test(config.url!) || config.url!.indexOf(config.baseURL!) === 0) {
         config.withCredentials = true;
       }
     }
   });
 }
 
-function setupProgress(axios: NuxtAxiosInstance, globalName: string) {
-  if (process.server) {
+function setupProgress(axios: NuxtAxiosInstance, globalName: string) { // @ts-ignore
+  if (import.meta.server) {
     return;
   }
 
@@ -230,7 +230,7 @@ function setupProgress(axios: NuxtAxiosInstance, globalName: string) {
 
   let currentRequests = 0;
 
-  axios.onRequest((config) => {
+  axios.onRequest((config) => { // @ts-ignore
     if (config && config.progress === false) {
       return;
     }
@@ -238,7 +238,7 @@ function setupProgress(axios: NuxtAxiosInstance, globalName: string) {
     currentRequests++;
   });
 
-  axios.onResponse((response) => {
+  axios.onResponse((response) => { // @ts-ignore
     if (response && response.config && response.config.progress === false) {
       return;
     }
@@ -250,7 +250,7 @@ function setupProgress(axios: NuxtAxiosInstance, globalName: string) {
     }
   });
 
-  axios.onError((error) => {
+  axios.onError((error) => { // @ts-ignore
     if (error && error.config && error.config.progress === false) {
       return;
     }

@@ -1,7 +1,7 @@
-import { defineNuxtPlugin } from '#app';
+import { defineNuxtPlugin, useNuxtApp } from '#app';
 
-export default defineNuxtPlugin(({ $axios }) => {
-  $axios.onAuthError((error) => {
+export default defineNuxtPlugin(() => {
+  useNuxtApp().$axios.onAuthError((error) => {
     console.log(error);
   });
 });

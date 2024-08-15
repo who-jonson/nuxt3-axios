@@ -1,6 +1,7 @@
 import { defu } from 'defu';
+import { dirname, join, relative } from 'path';
 import { getObjProp, objectEntries, objectPick, setObjProp } from '@whoj/utils-core';
-import { addImports, addPlugin, addTypeTemplate, createResolver, defineNuxtModule, useLogger } from '@nuxt/kit';
+import { addImports, addPlugin, addTypeTemplate, createResolver, defineNuxtModule, resolvePath, useLogger } from '@nuxt/kit';
 
 import { name, version } from '../package.json';
 import type { NuxtAxiosInstance, NuxtAxiosOptions } from './options';
@@ -61,7 +62,7 @@ export default defineNuxtModule<NuxtAxiosOptions>({
       'x-forwarded-proto'
     ]
   }),
-  setup(_options, nuxt) {
+  async setup(_options, nuxt) {
     const logger = useLogger('nuxt:axios');
     // Combined options
     const moduleOptions = defu(
@@ -167,7 +168,7 @@ export default defineNuxtModule<NuxtAxiosOptions>({
     setObjProp(nuxt.options.runtimeConfig, CONFIG_KEY, objectPick(options, ['agents', 'baseUrl', 'baseURL']));
     setObjProp(nuxt.options.runtimeConfig.public, CONFIG_KEY, { ...options, baseUrl: undefined, baseURL: undefined, agents: undefined });
 
-    // resolver
+    // @ts-ignore
     const { resolve } = createResolver(import.meta.url);
 
     nuxt.options.build.transpile.push(resolve('./runtime'));
@@ -194,6 +195,9 @@ export default defineNuxtModule<NuxtAxiosOptions>({
 
     logger.debug(`baseURL: ${options.baseURL}`);
     logger.debug(`browserBaseURL: ${options.browserBaseURL}`);
+
+    let nuxtPath = dirname(await resolvePath('nuxt'));
+    nuxtPath = relative(join(nuxt.options.buildDir, 'types'), join(nuxtPath, 'dist'));
 
     addTypeTemplate({
       filename: 'types/nuxt3-axios.d.ts',
@@ -227,7 +231,7 @@ declare module 'nuxt/schema' {
   }
 }
 
-declare module '#app' {
+declare module '${join(dirname(nuxtPath), 'app/nuxt')}' {
   interface NuxtApp {
     $${options.alias}: NuxtAxiosInstance;
   }

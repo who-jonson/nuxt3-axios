@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, useAxios } from '#imports';
+import { useAxios } from '#imports';
 
 interface UserData {
   userId: number;
@@ -8,12 +8,14 @@ interface UserData {
   completed: boolean;
 }
 
-const { execute } = useAxios<UserData>('/todos/1', {}, { immediate: false });
+const { data, error } = await useAxios<UserData>('/todos/1', {}, { immediate: true });
 
-onMounted(async () => {
-  const { data, error } = await execute();
-  console.log(data, error);
-});
+console.log(data.value, error.value);
+
+// onMounted(async () => {
+//   // const { data, error } = await execute();
+//
+// });
 </script>
 
 <template>
