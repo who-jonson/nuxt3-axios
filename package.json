@@ -71,6 +71,20 @@
     "@vueuse/integrations": ">=10 || ^11",
     "@whoj/utils-core": ">=1 || ^2"
   },
+  "peerDependenciesMeta": {
+    "nuxt": {
+      "optional": false
+    },
+    "@vueuse/core": {
+      "optional": false
+    },
+    "@vueuse/integrations": {
+      "optional": false
+    },
+    "@whoj/utils-core": {
+      "optional": false
+    }
+  },
   "pnpm": {
     "overrides": {
       "typescript": "$typescript"
