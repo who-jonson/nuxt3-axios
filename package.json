@@ -31,7 +31,7 @@
     "*.d.ts"
   ],
   "scripts": {
-    "build": "nuxt-module-build",
+    "build": "nuxt-module-build build",
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "prepublishOnly": "run-s clear lint build",
@@ -41,40 +41,42 @@
     "cleanup": "nuxi cleanup playground",
     "stub": "run-s cleanup dev:prepare",
     "lint": "eslint \"{**/*,*}.{ts,tsx,vue}\" --fix",
-    "dev:prepare": "nuxi prepare playground"
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground"
   },
   "dependencies": {
-    "@nuxt/kit": "^3.12.2",
-    "@vueuse/integrations": "^10.11.1",
-    "@whoj/utils-core": "^1.8.0",
+    "@nuxt/kit": "^3.13.2",
     "axios": "^1.7.4",
     "axios-retry": "^4.5.0",
     "defu": "^6.1.4"
   },
   "devDependencies": {
-    "@nuxt/module-builder": "^0.8.3",
-    "@nuxt/test-utils": "^3.14.1",
-    "@types/node": "^20.14.15",
-    "@vueuse/core": "^10.11.1",
+    "@nuxt/module-builder": "^0.8.4",
+    "@nuxt/test-utils": "^3.14.4",
+    "@types/node": "^22.9.0",
+    "@vueuse/core": "^11.2.0",
+    "@vueuse/integrations": "^11.2.0",
     "@whoj/eslint-config": "^1.5.0",
-    "bumpp": "^9.5.1",
-    "core-js": "^3.38.0",
+    "@whoj/utils-core": "^2.0.0",
+    "bumpp": "^9.8.1",
+    "core-js": "^3.39.0",
     "cross-env": "^7.0.3",
     "eslint": "^8.57.0",
     "npm-run-all": "^4.1.5",
-    "nuxt": "^3.12.4",
-    "typescript": "^5.5.4"
+    "nuxt": "^3.13.2",
+    "typescript": "^5.6.3"
   },
   "peerDependencies": {
-    "@nuxt/schema": "^3.6",
-    "@vueuse/core": "^^10"
+    "nuxt": "^3.13.2",
+    "@vueuse/core": ">=10 || ^11",
+    "@vueuse/integrations": ">=10 || ^11",
+    "@whoj/utils-core": ">=1 || ^2"
   },
   "pnpm": {
     "overrides": {
       "typescript": "$typescript"
     }
   },
-  "packageManager": "pnpm@9.7.1",
+  "packageManager": "pnpm@9.13.0",
   "sideEffects": false,
   "bugs": {
     "url": "https://github.com/who-jonson/nuxt3-axios/issues"

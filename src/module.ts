@@ -8,27 +8,27 @@ import type { NuxtAxiosInstance, NuxtAxiosOptions } from './options';
 
 const CONFIG_KEY = 'axios' as const;
 
-export default defineNuxtModule<NuxtAxiosOptions>({
+export default defineNuxtModule<NuxtAxiosOptions>().with({
   meta: {
     name,
     version,
     configKey: CONFIG_KEY,
     compatibility: {
       bridge: false,
-      nuxt: '^3.7.0'
+      nuxt: '^3.13.2'
     }
   },
   defaults: ({ options }) => ({
-    alias: 'axios',
+    alias: 'axios' as const,
     autoImport: {
       enabled: false,
       imports: {
-        useAxios: 'useAxios',
-        useAxiosGet: 'useAxiosGet',
-        useAxiosPost: 'useAxiosPost',
-        useAxiosPut: 'useAxiosPut',
-        useAxiosPatch: 'useAxiosPatch',
-        useAxiosDelete: 'useAxiosDelete'
+        useAxios: 'useAxios' as const,
+        useAxiosGet: 'useAxiosGet' as const,
+        useAxiosPost: 'useAxiosPost' as const,
+        useAxiosPut: 'useAxiosPut' as const,
+        useAxiosPatch: 'useAxiosPatch' as const,
+        useAxiosDelete: 'useAxiosDelete' as const
       },
       priority: 1
     },
@@ -60,7 +60,7 @@ export default defineNuxtModule<NuxtAxiosOptions>({
       'x-forwarded-host',
       'x-forwarded-port',
       'x-forwarded-proto'
-    ]
+    ] as const
   }),
   async setup(_options, nuxt) {
     const logger = useLogger('nuxt:axios');
