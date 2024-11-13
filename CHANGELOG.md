@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.5.3
+
+[compare changes](https://github.com/who-jonson/nuxt3-axios/compare/v1.5.2...v1.5.3)
+
+### 📦 Build
+
+- Updated dependencies as well as node version ([b76b48c](https://github.com/who-jonson/nuxt3-axios/commit/b76b48c))
+
+### ❤️ Contributors
+
+- Jonson Bhowmik ([@who-jonson](http://github.com/who-jonson))
+
 ## v1.5.2
 
 [compare changes](https://github.com/who-jonson/nuxt3-axios/compare/v1.5.1...v1.5.2)
